@@ -26,7 +26,7 @@ import {
 import { Product, Category, LocalizedString, Offer } from '@/types';
 import { storageService } from '@/services/storageService';
 import { productService } from '@/services/productService';
-import { Loader2, Plus, Trash2, Image as ImageIcon, Tags } from 'lucide-react';
+import { Loader2, Plus, Trash2, Image as ImageIcon, Tags, Pencil } from 'lucide-react';
 
 const INITIAL_LOCALIZED_STRING: LocalizedString = { en: '', fr: '', ar: '', it: '' };
 
@@ -39,6 +39,9 @@ export default function ProductsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isOffersDialogOpen, setIsOffersDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Edit Mode State
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Product Form State
   const [name, setName] = useState<LocalizedString>(INITIAL_LOCALIZED_STRING);
@@ -72,13 +75,13 @@ export default function ProductsPage() {
     fetchData();
   }, []);
 
-  const handleCreateProduct = async () => {
+  const handleCreateOrUpdateProduct = async () => {
     if (!name.en || !categoryId) return;
     setIsLoading(true);
     try {
       let finalImageUrl = imageUrl;
 
-      // 1. Upload Image if selected
+      // 1. Upload Image if selected (and different from existing if updating)
       if (imageFile) {
         try {
           finalImageUrl = await storageService.uploadImage(imageFile, 'images', 'products');
@@ -88,15 +91,29 @@ export default function ProductsPage() {
         }
       }
 
-      const newProd = await productService.createProduct({
-        name,
-        description,
-        category: categoryId,
-        imageUrl: finalImageUrl || undefined,
-        offers: [],
-        rating: 5.0
-      });
-      setProducts([...products, newProd]);
+      if (isEditMode && selectedProduct) {
+        // UPDATE
+        const updatedProd = await productService.updateProduct(selectedProduct.id, {
+          name,
+          description,
+          category: categoryId,
+          imageUrl: finalImageUrl || undefined,
+          // Offers handled separately
+        });
+        setProducts(products.map(p => p.id === updatedProd.id ? updatedProd : p));
+      } else {
+        // CREATE
+        const newProd = await productService.createProduct({
+          name,
+          description,
+          category: categoryId,
+          imageUrl: finalImageUrl || undefined,
+          offers: [],
+          rating: 5.0
+        });
+        setProducts([...products, newProd]);
+      }
+
       setIsAddDialogOpen(false);
       resetProductForm();
     } catch (e) {
@@ -163,7 +180,19 @@ export default function ProductsPage() {
     setDescription(INITIAL_LOCALIZED_STRING);
     setImageUrl('');
     setImageFile(null); // Reset file
+    setIsEditMode(false);
+    setSelectedProduct(null);
     if (categories.length > 0) setCategoryId(categories[0].id);
+  };
+
+  const openEditDialog = (product: Product) => {
+    setSelectedProduct(product);
+    setName(product.name);
+    setDescription(product.description);
+    setImageUrl(product.imageUrl || '');
+    setCategoryId(product.category);
+    setIsEditMode(true);
+    setIsAddDialogOpen(true);
   };
 
   const openOffersDialog = (product: Product) => {
@@ -195,7 +224,7 @@ export default function ProductsPage() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[700px]">
             <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
+              <DialogTitle>{isEditMode ? 'Edit Product' : 'Add New Product'}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -271,7 +300,9 @@ export default function ProductsPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleCreateProduct}>Create Product</Button>
+              <Button onClick={handleCreateOrUpdateProduct}>
+                {isEditMode ? 'Update Product' : 'Create Product'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -404,6 +435,9 @@ export default function ProductsPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
+                      <Button variant="outline" size="sm" className="mr-2" onClick={() => openEditDialog(product)}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
                       <Button variant="outline" size="sm" className="mr-2" onClick={() => openOffersDialog(product)}>
                         <Tags className="w-4 h-4 mr-2" />
                         Offers

@@ -12,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AdminViewUser, userService } from '@/services/userService';
-import { Loader2, MoreHorizontal, Shield, ShieldAlert, BadgeCheck } from 'lucide-react';
+import { Loader2, MoreHorizontal, Shield, ShieldAlert, BadgeCheck, Trash2 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 export default function UsersPage() {
@@ -45,6 +45,22 @@ export default function UsersPage() {
     setUsers(users.map(u => u.id === user.id ? { ...u, status: u.status === 'blocked' ? 'active' : 'blocked' } : u));
   };
 
+  const handleDeleteUser = async (user: AdminViewUser) => {
+    // 1. Confirm
+    if (!confirm(`Are you sure you want to delete user ${user.name}? This cannot be undone.`)) return;
+
+    try {
+      // 2. Delete
+      await userService.deleteUser(user.id);
+
+      // 3. Update State
+      setUsers(users.filter(u => u.id !== user.id));
+    } catch (error) {
+      console.error("Failed to delete user", error);
+      alert("Failed to delete user. Ensure you have permissions.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -67,7 +83,7 @@ export default function UsersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ByName</TableHead>
+                  <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
@@ -98,14 +114,24 @@ export default function UsersPage() {
                     <TableCell>{user.joinedAt}</TableCell>
                     <TableCell className="text-right">
                       {user.role !== 'admin' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleToggleBlock(user)}
-                          className={user.status === 'active' ? "text-red-600 hover:text-red-700 hover:bg-red-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
-                        >
-                          {user.status === 'active' ? "Block" : "Unblock"}
-                        </Button>
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleBlock(user)}
+                            className={cn("mr-2", user.status === 'active' ? "text-orange-600 hover:text-orange-700 hover:bg-orange-50" : "text-green-600 hover:text-green-700 hover:bg-green-50")}
+                          >
+                            {user.status === 'active' ? "Block" : "Unblock"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                            onClick={() => handleDeleteUser(user)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
                       )}
                     </TableCell>
                   </TableRow>

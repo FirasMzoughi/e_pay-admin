@@ -146,6 +146,35 @@ export const productService = {
     };
   },
 
+  updateProduct: async (id: string, product: Partial<Omit<Product, 'id' | 'offers'>>): Promise<Product> => {
+    const updates: any = {};
+    if (product.category) updates.category_id = product.category;
+    if (product.name) {
+      updates.name_en = product.name.en;
+      updates.name_fr = product.name.fr;
+      updates.name_ar = product.name.ar;
+      updates.name_it = product.name.it;
+    }
+    if (product.description) {
+      updates.description_en = product.description.en;
+      updates.description_fr = product.description.fr;
+      updates.description_ar = product.description.ar;
+      updates.description_it = product.description.it;
+    }
+    if (product.imageUrl !== undefined) updates.image_url = product.imageUrl;
+    if (product.rating !== undefined) updates.rating = product.rating;
+
+    const { data, error } = await supabase
+      .from('products')
+      .update(updates)
+      .eq('id', id)
+      .select('*, product_offers(*)')
+      .single();
+
+    if (error) throw error;
+    return mapProductFromDB(data);
+  },
+
   deleteProduct: async (id: string) => {
     const { error } = await supabase.from('products').delete().eq('id', id);
     if (error) throw error;

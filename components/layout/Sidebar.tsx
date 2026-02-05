@@ -14,7 +14,8 @@ import {
   LogOut,
   Sparkles,
   X,
-  ShieldCheck
+  ShieldCheck,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -28,6 +29,7 @@ const navItems = [
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
   { href: '/dashboard/payment-methods', label: 'Payment Methods', icon: CreditCard }, // Updated link
   { href: '/dashboard/transactions', label: 'Transactions', icon: CreditCard },
+  { href: '/dashboard/chat', label: 'Support Chat', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
