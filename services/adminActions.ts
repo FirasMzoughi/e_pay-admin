@@ -17,7 +17,7 @@ export async function createAdminUser(prevState: any, formData: FormData) {
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'super_admin') {
+  if ((profile as any)?.role !== 'super_admin') {
     return { error: 'Unauthorized. Only Super Admins can create admins.' };
   }
 

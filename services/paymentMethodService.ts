@@ -30,7 +30,7 @@ export const paymentMethodService = {
         description: method.description,
         image_url: method.imageUrl,
         is_enabled: method.isEnabled
-      })
+      } as any)
       .select()
       .single();
 
@@ -51,7 +51,7 @@ export const paymentMethodService = {
     if (current) {
       const { error } = await supabase
         .from('payment_methods')
-        .update({ is_enabled: !current.is_enabled })
+        .update({ is_enabled: !(current as any).is_enabled } as any)
         .eq('id', id);
 
       if (error) throw error;

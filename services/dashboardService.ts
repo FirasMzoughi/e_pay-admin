@@ -33,7 +33,7 @@ export const dashboardService = {
       // Fallback to 0
     }
 
-    const totalRevenue = revenueData?.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0) || 0;
+    const totalRevenue = revenueData?.reduce((acc, curr) => acc + (Number((curr as any).amount) || 0), 0) || 0;
     const activeUsers = 0; // Requires 'last_sign_in_at' or specific status tracking which we mocked in UserService
 
     return {
