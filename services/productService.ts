@@ -146,6 +146,11 @@ export const productService = {
     };
   },
 
+  deleteProduct: async (id: string) => {
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) throw error;
+  },
+
   // ...
 
   addOffer: async (productId: string, offer: Omit<Offer, 'id'>): Promise<Offer> => {
