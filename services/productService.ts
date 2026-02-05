@@ -87,6 +87,17 @@ export const productService = {
 
   // ...
 
+  // --- Products ---
+  getProducts: async (): Promise<Product[]> => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, product_offers(*)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(mapProductFromDB);
+  },
+
   createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
     // 1. Create Product
     const { data: prodData, error: prodError } = await supabase
