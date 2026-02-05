@@ -80,6 +80,11 @@ export const productService = {
     return mapCategoryFromDB(data);
   },
 
+  deleteCategory: async (id: string) => {
+    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (error) throw error;
+  },
+
   // ...
 
   createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
