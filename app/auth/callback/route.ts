@@ -27,7 +27,7 @@ export async function GET(request: Request) {
           full_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0],
           avatar_url: session.user.user_metadata.avatar_url,
           role: 'user', // Default role
-        });
+        } as any);
       }
     }
   }
