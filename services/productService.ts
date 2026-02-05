@@ -123,7 +123,7 @@ export const productService = {
     // 2. Create Offers if any (though usually empty on creation based on UI)
     if (product.offers.length > 0) {
       const offersToInsert = product.offers.map(o => ({
-        product_id: prodData.id,
+        product_id: (prodData as any).id,
         name_en: o.name.en,
         name_fr: o.name.fr,
         name_ar: o.name.ar,

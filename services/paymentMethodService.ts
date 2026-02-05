@@ -49,9 +49,9 @@ export const paymentMethodService = {
     const { data: current } = await supabase.from('payment_methods').select('is_enabled').eq('id', id).single();
 
     if (current) {
-      const { error } = await supabase
-        .from('payment_methods')
-        .update({ is_enabled: !(current as any).is_enabled } as any)
+      const { error } = await (supabase
+        .from('payment_methods') as any)
+        .update({ is_enabled: !(current as any).is_enabled })
         .eq('id', id);
 
       if (error) throw error;
