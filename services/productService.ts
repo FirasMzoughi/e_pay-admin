@@ -54,8 +54,8 @@ const mapOfferFromDB = (row: any): Offer => ({
 export const productService = {
   // --- Categories ---
   getCategories: async (): Promise<Category[]> => {
-    const { data, error } = await supabase
-      .from('categories')
+    const { data, error } = await (supabase
+      .from('categories') as any)
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -64,8 +64,8 @@ export const productService = {
   },
 
   createCategory: async (category: Omit<Category, 'id'>): Promise<Category> => {
-    const { data, error } = await supabase
-      .from('categories')
+    const { data, error } = await (supabase
+      .from('categories') as any)
       .insert({
         name_en: category.name.en,
         name_fr: category.name.fr,
@@ -81,7 +81,7 @@ export const productService = {
   },
 
   deleteCategory: async (id: string) => {
-    const { error } = await supabase.from('categories').delete().eq('id', id);
+    const { error } = await (supabase.from('categories') as any).delete().eq('id', id);
     if (error) throw error;
   },
 
@@ -89,8 +89,8 @@ export const productService = {
 
   // --- Products ---
   getProducts: async (): Promise<Product[]> => {
-    const { data, error } = await supabase
-      .from('products')
+    const { data, error } = await (supabase
+      .from('products') as any)
       .select('*, product_offers(*)')
       .order('created_at', { ascending: false });
 
@@ -100,8 +100,8 @@ export const productService = {
 
   createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
     // 1. Create Product
-    const { data: prodData, error: prodError } = await supabase
-      .from('products')
+    const { data: prodData, error: prodError } = await (supabase
+      .from('products') as any)
       .insert({
         category_id: product.category,
         name_en: product.name.en,
@@ -131,8 +131,8 @@ export const productService = {
         price: o.price
       }));
 
-      const { error: offersError } = await supabase
-        .from('product_offers')
+      const { error: offersError } = await (supabase
+        .from('product_offers') as any)
         .insert(offersToInsert as any);
 
       if (offersError) throw offersError;
@@ -164,8 +164,8 @@ export const productService = {
     if (product.imageUrl !== undefined) updates.image_url = product.imageUrl;
     if (product.rating !== undefined) updates.rating = product.rating;
 
-    const { data, error } = await supabase
-      .from('products')
+    const { data, error } = await (supabase
+      .from('products') as any)
       .update(updates)
       .eq('id', id)
       .select('*, product_offers(*)')
@@ -176,15 +176,15 @@ export const productService = {
   },
 
   deleteProduct: async (id: string) => {
-    const { error } = await supabase.from('products').delete().eq('id', id);
+    const { error } = await (supabase.from('products') as any).delete().eq('id', id);
     if (error) throw error;
   },
 
   // ...
 
   addOffer: async (productId: string, offer: Omit<Offer, 'id'>): Promise<Offer> => {
-    const { data, error } = await supabase
-      .from('product_offers')
+    const { data, error } = await (supabase
+      .from('product_offers') as any)
       .insert({
         product_id: productId,
         name_en: offer.name.en,
@@ -201,7 +201,7 @@ export const productService = {
   },
 
   deleteOffer: async (offerId: string): Promise<void> => {
-    const { error } = await supabase.from('product_offers').delete().eq('id', offerId);
+    const { error } = await (supabase.from('product_offers') as any).delete().eq('id', offerId);
     if (error) throw error;
   }
 };

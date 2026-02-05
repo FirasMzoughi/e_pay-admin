@@ -16,8 +16,8 @@ const mapTransactionFromDB = (row: any): Transaction => ({
 
 export const transactionService = {
   getTransactions: async (): Promise<Transaction[]> => {
-    const { data, error } = await supabase
-      .from('transactions')
+    const { data, error } = await (supabase
+      .from('transactions') as any)
       .select('*, profiles(full_name, email)') // Join profiles
       .order('created_at', { ascending: false });
 
@@ -26,8 +26,8 @@ export const transactionService = {
   },
 
   updateStatus: async (id: string, status: 'approved' | 'rejected'): Promise<void> => {
-    const { error } = await supabase
-      .from('transactions')
+    const { error } = await (supabase
+      .from('transactions') as any)
       .update({ status })
       .eq('id', id);
 

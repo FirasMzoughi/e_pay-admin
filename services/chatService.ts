@@ -30,8 +30,8 @@ export const chatService = {
   // --- Conversations (Users who have chatted) ---
   getConversations: async (): Promise<ChatUser[]> => {
     // 1. Get unique user_ids from messages, ordered by most recent
-    const { data: messages, error } = await supabase
-      .from('messages')
+    const { data: messages, error } = await (supabase
+      .from('messages') as any)
       .select('user_id, created_at')
       .order('created_at', { ascending: false })
       .limit(100);
@@ -55,7 +55,7 @@ export const chatService = {
       const lastMsg = messages.find((m: any) => m.user_id === p.id);
       return {
         ...p,
-        last_message_at: lastMsg?.created_at
+        last_message_at: lastMsg ? lastMsg.created_at : null // safe access
       };
     });
 
@@ -67,8 +67,8 @@ export const chatService = {
 
   // --- Messages ---
   getMessages: async (userId: string): Promise<ChatMessage[]> => {
-    const { data, error } = await supabase
-      .from('messages')
+    const { data, error } = await (supabase
+      .from('messages') as any)
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: true });
@@ -78,8 +78,8 @@ export const chatService = {
   },
 
   sendMessage: async (userId: string, content: string, imageUrl?: string): Promise<ChatMessage> => {
-    const { data, error } = await supabase
-      .from('messages')
+    const { data, error } = await (supabase
+      .from('messages') as any)
       .insert({
         user_id: userId,
         content: content,
@@ -111,8 +111,8 @@ export const chatService = {
 
   // --- Saved Replies ---
   getSavedReplies: async (): Promise<SavedReply[]> => {
-    const { data, error } = await supabase
-      .from('saved_replies')
+    const { data, error } = await (supabase
+      .from('saved_replies') as any)
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -121,8 +121,8 @@ export const chatService = {
   },
 
   createSavedReply: async (title: string, content: string): Promise<SavedReply> => {
-    const { data, error } = await supabase
-      .from('saved_replies')
+    const { data, error } = await (supabase
+      .from('saved_replies') as any)
       .insert({ title, content })
       .select()
       .single();
@@ -132,8 +132,8 @@ export const chatService = {
   },
 
   deleteSavedReply: async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('saved_replies')
+    const { error } = await (supabase
+      .from('saved_replies') as any)
       .delete()
       .eq('id', id);
 
