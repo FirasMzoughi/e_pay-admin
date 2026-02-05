@@ -10,7 +10,6 @@ import { useEffect, useRef } from 'react';
 
 const initialState = {
   error: '',
-  success: '',
 };
 
 function SubmitButton() {
